@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>KPPTR</title>
+        <script>
+            function clicked(e)
+            {
+                if(!confirm('Are you sure?')) {
+                    e.preventDefault();
+                }
+            }
+            </script>
+            
+    </head>
+    <body style=text-align:center;>
+        <a href="start" style="position:center;color:green; cursor:pointer; font-size:100px; text-decoration:none;">Start logging</a>
+        <br><br><br><br><br><br>
+        <a href="stop" onclick="return confirm('Are you sure to stop logging?');" style="position:center; color:red; cursor:pointer; font-size:100px; text-decoration:none;">Stop logging</a>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        <a href="download" style="position:center;color:green; cursor:pointer; font-size:100px; text-decoration:none;">Download telemetry file</a>
+        <br><br><br><br><br><br>
+        <a href="delete" onclick="return confirm('Are you sure to delete all files?');" style="position:center; color:red; cursor:pointer; font-size:100px; text-decoration:none;">Delete telemetry file</a>
+    </body>
+</html>
