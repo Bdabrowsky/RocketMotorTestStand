@@ -45,7 +45,7 @@
 /* Include Files                                                              */
 /******************************************************************************/
 #include "AD7190.h"
-#include "Arduino.h"
+#include <Arduino.h>
 #include "Communication.h"
 #include "SPI.h"
 
@@ -75,9 +75,7 @@ unsigned char SPI_Init()
     GPIO1_PIN_IN;
 
     SPI.begin();
-    //SPI_2.setMOSI(PB15);
-    //SPI_2.setMISO(PB14);
-    //SPI_2.setSCLK(PB13);
+   
     SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
 	
     return(1);

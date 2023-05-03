@@ -116,14 +116,15 @@ unsigned char AD7190_Init(void)
 {
     unsigned char status = 1;
     unsigned char regVal = 0;
-    
+    Serial.println("im here");
     SPI_Init();
     AD7190_Reset();
     regVal = AD7190_GetRegisterValue(AD7190_REG_ID, 1, 1);
-    //if( (regVal & AD7190_ID_MASK)  != ID_AD7190)
-    //{
-    //    status = 0;
-    //}
+    Serial.println(regVal);
+    if( (regVal & AD7190_ID_MASK)  != ID_AD7190)
+    {
+        status = 0;
+    }
     return(status);
 }
 
@@ -218,12 +219,17 @@ void AD7190_Calibrate(unsigned char mode, unsigned char channel)
     
     AD7190_ChannelSelect(channel);
     oldRegValue = AD7190_GetRegisterValue(AD7190_REG_MODE, 3, 1);
+    log_w("oldRegValue: %d", oldRegValue);
+
     oldRegValue &= ~AD7190_MODE_SEL(0x7);
     newRegValue = oldRegValue | AD7190_MODE_SEL(mode);
+    log_w("newRegValue: %d", newRegValue);
+    
     ADI_CS_LOW; 
     AD7190_SetRegisterValue(AD7190_REG_MODE, newRegValue, 3, 0); // CS is not modified.
     AD7190_WaitRdyGoLow();
     ADI_CS_HIGH;
+    log_i("AD7190 calibrated");
 }
 
 /***************************************************************************//**

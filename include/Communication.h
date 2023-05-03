@@ -39,6 +39,8 @@
 ********************************************************************************
  *   SVN Revision: 903
 *******************************************************************************/
+#pragma once
+
 #ifndef _COMMUNICATION_H_
 #define _COMMUNICATION_H_
 
@@ -54,7 +56,7 @@
 #define ADI_CS_PIN_OUT    	pinMode(ADI_CS_PIN, OUTPUT)
 #define ADI_CS_LOW        	digitalWrite(ADI_CS_PIN, LOW)
 #define ADI_CS_HIGH       	digitalWrite(ADI_CS_PIN, HIGH)
-#define ADI_RDY_PIN       	12
+#define ADI_RDY_PIN       	13
 
 #define GPIO1_PIN_IN		pinMode(ADI_RDY_PIN, INPUT)
 #define GPIO1_PIN_STATUS	digitalRead(ADI_RDY_PIN)

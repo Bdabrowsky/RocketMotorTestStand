@@ -3,17 +3,14 @@
 
 bool FS_init(){
 
-    if(!SPIFFS.begin(true)){
+    if(!LittleFS.begin(false)){
        
         return false;
     }
-    appendFile(SPIFFS, "/log.csv", "\nThis is beginning of new log file. This happens after every reboot\n");
-    appendFile(SPIFFS, "/log.csv", "Timestamp, Force");
+    appendFile(LittleFS, "/log.csv", "\nThis is beginning of new log file. This happens after every reboot\n");
+    appendFile(LittleFS, "/log.csv", "Timestamp [ms], Force [N]\n");
 
     return true;
-
-
-  
 }
 
 void writeFile(fs::FS &fs, const char * path, const char * message){
@@ -25,34 +22,39 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
         return;
     }
     if(file.print(message)){
-        Serial.println("- file written");
+        log_i("- file written");
     } else {
-        Serial.println("- write failed");
+        log_e("- write failed");
     }
     file.close();
 }
 
 void appendFile(fs::FS &fs, const char * path, const char * message){
-    Serial.printf("Appending to file: %s\r\n", path);
+     log_w("Appending to file: %s\r\n", path);
 
     File file = fs.open(path, FILE_APPEND);
     if(!file){
-        Serial.println("- failed to open file for appending");
+        log_e("- failed to open file for appending");
         return;
     }
     if(file.print(message)){
-        Serial.println("- message appended");
+       log_i("- message appended");
     } else {
-        Serial.println("- append failed");
+        log_e("- append failed");
     }
     file.close();
 }
 
 void deleteFile(fs::FS &fs, const char * path){
-    Serial.printf("Deleting file: %s\r\n", path);
+        log_w("Deleting file: %s\r\n", path);
     if(fs.remove(path)){
-        Serial.println("- file deleted");
+        log_i("- file deleted");
     } else {
-        Serial.println("- delete failed");
+        log_e("- delete failed");
     }
+}
+
+void closeFile(fs::FS &fs, const char * path){
+    File file = fs.open(path, FILE_APPEND);
+    file.close();
 }
