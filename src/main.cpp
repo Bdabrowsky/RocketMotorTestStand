@@ -5,7 +5,7 @@
 #include "ESPAsyncWebServer.h"
 #include "FS.h"
 #include "SPIFFS.h"
-#include <LittleFS.h>
+#include <SPIFFS.h>
 #include "Utils.h"
 #include "FileSys.h"
 
@@ -13,6 +13,7 @@
 
 bool start = false;
 uint32_t timestamp = 0;
+uint32_t prevTimestamp = 0;
 
 const char *ssid = "Hamownia";
 //const char *password = "KPPTR";
@@ -21,11 +22,18 @@ AsyncWebServer server(80);
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(1, 48, NEO_GRB + NEO_KHZ800);
 
+int sampleCnt = 4000;
+
+char str[200000];
+
+int cnt = 0;
+
+const int freq = 200;
 
 void setup() {
   //Server stuff
   FS_init();
-
+  Serial.begin(115200);
  
   pixels.begin();
   
@@ -34,13 +42,13 @@ void setup() {
   }
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/index.html", "text/html", false);
+    request->send(SPIFFS, "/index.html", "text/html", false);
   });
   
   server.serveStatic("/download", SPIFFS, "/log.csv");
  
   server.on("/parse", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/log.csv", "text/plain", false);
+    request->send(SPIFFS, "/log.csv", "text/plain", false);
   });
 
   server.on("/help", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -48,7 +56,7 @@ void setup() {
   });
 
   server.on("/delete", HTTP_GET, [](AsyncWebServerRequest *request){
-    deleteFile(LittleFS, "/log.csv");
+    deleteFile(SPIFFS, "/log.csv");
 
     for(int i=0;i<5;i++){
       pixels.setPixelColor(0, pixels.Color(10,00,0)); //Set LED to RED
@@ -62,14 +70,14 @@ void setup() {
   server.on("/start", HTTP_GET, [](AsyncWebServerRequest *request){
     start = true;
     pixels.setPixelColor(0, pixels.Color(0,0, 10)); //Set LED to BLUE
-    request->send(LittleFS, "/index.html", "text/html", false);
+    request->send(SPIFFS, "/index.html", "text/html", false);
   });
 
   server.on("/stop", HTTP_GET, [](AsyncWebServerRequest *request){
     start = false;
-    closeFile(LittleFS, "/log.csv");
+    closeFile(SPIFFS, "/log.csv");
     pixels.setPixelColor(0, pixels.Color(0,10, 0)); //Set LED to GREEN
-    request->send(LittleFS, "/index.html", "text/html", false);
+    request->send(SPIFFS, "/index.html", "text/html", false);
   });
 
   server.begin();
@@ -89,22 +97,38 @@ void setup() {
   AD7190_RangeSetup(0, AD7190_CONF_GAIN_128);
 
   UtilsInit(500.0, 0.00197, 0, 5.0, AD7190_CONF_GAIN_128);
-  float temporaryCal = UtilsSrv(AD7190_ContinuousReadAvg(10));
+  float temporaryCal = UtilsSrv(AD7190_ContinuousReadAvg(100));
   //UtilsInit(1000.0, 0.00197/2.0, temporaryCal, 5.0, AD7190_CONF_GAIN_128);
 }
 
 void loop() {
-  float dat = UtilsSrv(AD7190_ContinuousSingleRead());
+  
   timestamp = micros();
-  if(start){
-    char temp[50];
-   
-    sprintf(temp, "%d,%f\n", timestamp, dat);
-    appendFile(LittleFS, "/log.csv", temp);
-  }
+  
+  if((timestamp - prevTimestamp) >= 1000000/freq){
+    Serial.println(timestamp - prevTimestamp);
+    prevTimestamp = timestamp;
 
+    float dat = UtilsSrv(AD7190_ContinuousReadAvg(5));
+    if(start){
+      char temp[50];
+    
+      sprintf(temp, "%d,%f\n", timestamp, dat);
+      strcat(str, temp);
+      cnt++;
+    }
+
+    if(cnt == 10000 || (!start && cnt > 0)){
+      appendFile(SPIFFS, "/log.csv", str);
+      sprintf(str, "");
+      cnt = 0;
+    }
+
+    //Serial.println(UtilsSrv(AD7190_ContinuousSingleRead()));
+  }
   //Serial.print(timestamp);
   //Serial.print(" ");
-  //Serial.println(UtilsSrv(AD7190_ContinuousSingleRead()));
+  
   pixels.show();
-}
+
+} 

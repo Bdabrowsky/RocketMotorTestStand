@@ -3,12 +3,12 @@
 
 bool FS_init(){
 
-    if(!LittleFS.begin(false)){
+    if(!SPIFFS.begin(false)){
        
         return false;
     }
-    appendFile(LittleFS, "/log.csv", "\nThis is beginning of new log file. This happens after every reboot\n");
-    appendFile(LittleFS, "/log.csv", "Timestamp [ms], Force [N]\n");
+    appendFile(SPIFFS, "/log.csv", "\nThis is beginning of new log file. This happens after every reboot\n");
+    appendFile(SPIFFS, "/log.csv", "Timestamp [ms], Force [N]\n");
 
     return true;
 }
@@ -42,7 +42,7 @@ void appendFile(fs::FS &fs, const char * path, const char * message){
     } else {
         log_e("- append failed");
     }
-    file.close();
+   
 }
 
 void deleteFile(fs::FS &fs, const char * path){

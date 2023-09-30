@@ -286,7 +286,7 @@ unsigned long AD7190_SingleConversion(void)
  
     command = AD7190_MODE_SEL(AD7190_MODE_SINGLE) | 
               AD7190_MODE_CLKSRC(AD7190_CLK_INT) |
-              AD7190_MODE_RATE(0x060);    
+              AD7190_MODE_RATE(0x020);    
     ADI_CS_LOW;
     AD7190_SetRegisterValue(AD7190_REG_MODE, command, 3, 0); // CS is not modified.
     AD7190_WaitRdyGoLow();
@@ -316,7 +316,7 @@ unsigned long AD7190_ContinuousReadAvg(unsigned char sampleNumber)
     command = AD7190_MODE_SEL(AD7190_MODE_CONT) | 
               AD7190_MODE_CLKSRC(AD7190_CLK_INT) |
               AD7190_MODE_SINC3 |
-              AD7190_MODE_RATE(0x10);
+              AD7190_MODE_RATE(0x04);
     ADI_CS_LOW;
     AD7190_SetRegisterValue(AD7190_REG_MODE, command, 3, 0); // CS is not modified.
     for(count = 0;count < sampleNumber;count ++)
